@@ -10,7 +10,8 @@ import math
 from helperfunctions import calculate_font_size
 
 def generate_pdf(docname, width, height, margin, title, matrices,subtitle, 
-num_tables_per_page = 4,
+    subsubtitle,
+    num_tables_per_page = 4,
                 tables_per_row = 2, table_font_size=9, linesize = 1):
 
     pdfmetrics.registerFont(TTFont('Lobster', 'Fonts/Lobster-Regular.ttf')) 
@@ -19,8 +20,12 @@ num_tables_per_page = 4,
     title_font = "Lobster"
     title_size = 20
 
-    subtitle_font = "DancingScript"
-    subtitle_size = 18
+    subtitle_font = "Lobster" # "DancingScript"
+    subtitle_size = 24
+    subsubtitle_size = 22
+
+    subtitle_margin = 3*margin
+    subsubtitle_margin = 4 * margin
 
     
 
@@ -29,14 +34,16 @@ num_tables_per_page = 4,
     c = canvas.Canvas(docname, pagesize=(width, height))
 
     # Setzen des Titels auf jeder Seite
-    c.setFont(title_font, title_size)
-    c.drawCentredString(width / 2, height - margin, title)
+    # c.setFont(title_font, title_size)
+    # c.drawCentredString(width / 2, height - 3* margin, title)
+
+    
 
     num_matrices = len(matrices)
 
     # Berechnung der Breite einer Tabelle
     table_width_tmp = (width - (3 * margin)) / tables_per_row
-    table_height_tmp = (height - (3 * margin)) / number_rows
+    table_height_tmp = (height - (subsubtitle_margin +  margin)) / number_rows
     table_width = min(table_width_tmp,table_height_tmp )
     # Berechnung der Höhe einer Tabelle, um das Seitenverhältnis beizubehalten
     table_height = table_width
@@ -111,10 +118,24 @@ num_tables_per_page = 4,
             # Hinzufügen des Texts "Rätsel" + Nummer der Matrix über der Tabelle
             c.setFont(subtitle_font, subtitle_size)
             text = f"{subtitle} {matrix_idx + 1}"
-            text_width = c.stringWidth(text, subtitle_font, subtitle_size)
-            text_x = table_x + (table_width - text_width) / 2
-            text_y = table_y + table_height + margin / 2
-            c.drawString(text_x, text_y, text)
+            c.drawCentredString(width / 2, height - subtitle_margin, text)
+            #text_width = c.stringWidth(text, subtitle_font, subtitle_size)
+            # text_x = table_x + (table_width - text_width) / 2
+            # text_y = table_y + table_height + margin
+            # c.drawString(text_x, text_y, text)
+
+            c.setFont(subtitle_font, subsubtitle_size)
+            text = f"{subsubtitle}"
+            c.drawCentredString(width / 2, height - subsubtitle_margin, text)
+            # text_width = c.stringWidth(text, subtitle_font, subtitle_size)
+            # text_x = table_x + (table_width - text_width) / 2
+            # text_y = table_y + table_height + margin +4
+            # c.drawString(text_x, text_y, text)
+            c.setFont(subtitle_font, subsubtitle_size)
+            c.drawString(table_x, table_y, 'test')
+
+
+
 
     # Speichern und Schließen des PDF-Dokuments
     c.save()
