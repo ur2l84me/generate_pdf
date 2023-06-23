@@ -21,15 +21,25 @@ def generate_pdf(docname, width, height, margin, title, matrices,subtitle,
     title_size = 20
 
     subtitle_font = "Lobster" # "DancingScript"
-    subtitle_size = 24
+    subtitle_size = 50
     subsubtitle_size = 22
 
     subtitle_margin = 3*margin
     subsubtitle_margin = 4 * margin
 
-    
+    #define size of subpage depending on each how many sudokus are displayed
+    # each table must have a subtitel and subsubtitle 
 
-    number_rows = math.ceil(num_tables_per_page/tables_per_row)
+    number_rows = math.ceil(num_tables_per_page/tables_per_row) 
+    
+    height_printable = height - 2 *  margin 
+    width_printable = width - 2 * margin 
+
+    height_subpage = height_printable / number_rows
+    width_subpage = width_printable / tables_per_row
+
+    # Table has the lower 2/3 of the subpage 
+    # Title has the upper 1/3 of the subpage 
     # Erstellen eines Canvas-Objekts für das PDF
     c = canvas.Canvas(docname, pagesize=(width, height))
 
@@ -42,16 +52,19 @@ def generate_pdf(docname, width, height, margin, title, matrices,subtitle,
     num_matrices = len(matrices)
 
     # Berechnung der Breite einer Tabelle
-    table_width_tmp = (width - (3 * margin)) / tables_per_row
-    table_height_tmp = (height - (subsubtitle_margin +  margin)) / number_rows
+    # table_width_tmp = (width - (3 * margin)) / tables_per_row
+    # table_height_tmp = (height - (subsubtitle_margin +  margin)) / number_rows
+    # table_width = min(table_width_tmp,table_height_tmp )
+    space_between_objects= margin 
+    table_width_tmp = (width_subpage - (space_between_objects)) 
+    table_height_tmp = (height_subpage * 2 /3 - space_between_objects)
     table_width = min(table_width_tmp,table_height_tmp )
     # Berechnung der Höhe einer Tabelle, um das Seitenverhältnis beizubehalten
     table_height = table_width
+
+
     space_between_tables_cols =  (width - 2.1*margin - tables_per_row * table_width)/tables_per_row
     space_between_tables_row =  (height - 2.1*margin - number_rows * table_height)/number_rows
-    
-
-
     cell_width = table_width/10
     cell_height = table_height/10
     font_name = "Arial"
@@ -60,19 +73,15 @@ def generate_pdf(docname, width, height, margin, title, matrices,subtitle,
     # table_font_size = calculate_font_size(table_width, table_height, 
     # cell_width, cell_height, font_name, initial_font_size, sample_text)
 
-    print('table_font_size: '+ str(table_font_size) )
-
-
-
-    print('num_tables_per_page: ' + str(num_tables_per_page))
-    print('table_width: '+ str(table_width))
+   
 
     # Berechnung der Anzahl der Seiten basierend auf der Anzahl der Matrizen und Tabellen pro Seite
     num_pages = (num_matrices + num_tables_per_page - 1) // num_tables_per_page
 
     for page in range(num_pages):
-        # Neue Seite
-        c.showPage()
+        if page > 0: 
+            # Neue Seite
+            c.showPage()
 
         for table_idx in range(num_tables_per_page):
             matrix_idx = (page * num_tables_per_page) + table_idx
@@ -86,8 +95,23 @@ def generate_pdf(docname, width, height, margin, title, matrices,subtitle,
             # Berechnung der Position der Tabelle auf der Seite
             row = table_idx // tables_per_row
             col = table_idx % tables_per_row
-            table_x = margin + col * table_width +col * space_between_tables_cols
-            table_y = height - (2 *margin + (row + 1) * table_height) - row * space_between_tables_row
+            print('col:')
+            print(col)
+
+            # berechne mittelpunkt der Breite der Subpage und subtrahiere 
+            # dann die hälfte der tabellenbreite 
+            middle_subpage_x = margin + width_subpage * (col +1)/2
+            twothird_subpage_y = margin + height_subpage * (col +1)/3 *2 
+            table_x = middle_subpage_x - table_width/ 2 
+            table_y = twothird_subpage_y - table_height
+
+            height_header = height_subpage / 3 
+            subtitle_y = height - (margin + height_subpage * (col) + height_header /4 * 2 )
+            subsubtitle_y = height - (margin + height_subpage * (col) + height_header /4 * 3 )
+
+            subtitle_x = margin + width_subpage / 2 + width_subpage * col 
+            subsubtitle_x = subtitle_x
+
 
             data = matrix
 
@@ -118,24 +142,12 @@ def generate_pdf(docname, width, height, margin, title, matrices,subtitle,
             # Hinzufügen des Texts "Rätsel" + Nummer der Matrix über der Tabelle
             c.setFont(subtitle_font, subtitle_size)
             text = f"{subtitle} {matrix_idx + 1}"
-            c.drawCentredString(width / 2, height - subtitle_margin, text)
-            #text_width = c.stringWidth(text, subtitle_font, subtitle_size)
-            # text_x = table_x + (table_width - text_width) / 2
-            # text_y = table_y + table_height + margin
-            # c.drawString(text_x, text_y, text)
+            c.drawCentredString(subtitle_x ,  subtitle_y, text)
 
-            c.setFont(subtitle_font, subsubtitle_size)
-            text = f"{subsubtitle}"
-            c.drawCentredString(width / 2, height - subsubtitle_margin, text)
-            # text_width = c.stringWidth(text, subtitle_font, subtitle_size)
-            # text_x = table_x + (table_width - text_width) / 2
-            # text_y = table_y + table_height + margin +4
-            # c.drawString(text_x, text_y, text)
-            c.setFont(subtitle_font, subsubtitle_size)
-            c.drawString(table_x, table_y, 'test')
-
-
-
+            c.setFont(subtitle_font, subtitle_size)
+            text = f"{subsubtitle} "
+            c.drawCentredString(subsubtitle_x ,  subsubtitle_y, text)
+  
 
     # Speichern und Schließen des PDF-Dokuments
     c.save()

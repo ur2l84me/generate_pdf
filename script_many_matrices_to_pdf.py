@@ -4,13 +4,14 @@ from generate_sudoku_one_per_page_pdf import generate_single_page
 from reportlab.lib.units import inch
 
 
+# works only for 1 sudoku per page right now 
 file_path = '../sudoku-generator/sudoku_puzzles_large_print_book1_easy.txt'
 matrices = extract_matrices_from_file(file_path, typ = 'puzzle')
 
 width = 8.5 * inch
 height = 11 * inch
 margin = 0.5 * inch
-num_tables_per_page = 1 
+num_tables_per_page = 1
 title = "Sudoku"
 docname = 'sudoku_puzzles_large_print_book1_easy_Raetsel.pdf'
 subtitle = 'Puzzle'
@@ -27,7 +28,7 @@ generate_pdf(docname,
              subsubtitle,
              num_tables_per_page,
              tables_per_row,
-             table_font_size = 20,
+             table_font_size = 34,
              linesize = 2)
 
 # matrices = extract_matrices_from_file(file_path, typ = 'solution')
