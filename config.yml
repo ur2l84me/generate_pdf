@@ -1,0 +1,13 @@
+largePrint:
+  puzzle:
+    tables_per_row: 1
+    num_tables_per_page: 1 
+    margin: 0.5
+    table_font_size: 24 
+    linesize: 2 
+    subtitle_size: 50 
+    width: 8.5
+    height: 11
+    pdf_typ: puzzle
+  
+  
